@@ -4,6 +4,7 @@ go 1.23.2
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
+	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/georgysavva/scany v1.2.2
 	github.com/jackc/pgconn v1.14.3
 	github.com/jackc/pgx/v4 v4.18.3

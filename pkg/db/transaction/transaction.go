@@ -2,12 +2,12 @@ package transaction
 
 import (
 	"context"
-	"platform-common/pkg/db"
-	"platform-common/pkg/db/pg"
 
 	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 
+	"github.com/robertobadjio/platform-common/pkg/db"
+	"github.com/robertobadjio/platform-common/pkg/db/pg"
 )
 
 type manager struct {

@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"platform-common/pkg/db"
-	"platform-common/pkg/db/prettier"
 
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+
+	"github.com/robertobadjio/platform-common/pkg/db"
+	"github.com/robertobadjio/platform-common/pkg/db/prettier"
 )
 
 type key string
