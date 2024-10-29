@@ -2,6 +2,7 @@ package pg
 
 import (
 	"context"
+	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/pkg/errors"
@@ -10,17 +11,21 @@ import (
 )
 
 type pgClient struct {
-	masterDBC db.DB
+	masterDBC    db.DB
+	queryTimeout time.Duration
 }
 
-func New(ctx context.Context, dsn string) (db.Client, error) {
+func New(ctx context.Context, dsn string, queryTimeout time.Duration) (db.Client, error) {
 	dbc, err := pgxpool.Connect(ctx, dsn)
 	if err != nil {
 		return nil, errors.Errorf("failed to connect to db: %v", err)
 	}
 
 	return &pgClient{
-		masterDBC: &pg{dbc: dbc},
+		masterDBC: &pg{
+			dbc:          dbc,
+			queryTimeout: queryTimeout,
+		},
 	}, nil
 }
 
