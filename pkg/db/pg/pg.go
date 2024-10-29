@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgconn"
@@ -21,12 +22,14 @@ const (
 )
 
 type pg struct {
-	dbc *pgxpool.Pool
+	dbc          *pgxpool.Pool
+	queryTimeout time.Duration
 }
 
-func NewDB(dbc *pgxpool.Pool) db.DB {
+func NewDB(dbc *pgxpool.Pool, queryTimeout time.Duration) db.DB {
 	return &pg{
-		dbc: dbc,
+		dbc:          dbc,
+		queryTimeout: queryTimeout,
 	}
 }
 
@@ -55,6 +58,9 @@ func (p *pg) ScanAllContext(ctx context.Context, dest interface{}, q db.Query, a
 func (p *pg) ExecContext(ctx context.Context, q db.Query, args ...interface{}) (pgconn.CommandTag, error) {
 	logQuery(ctx, q, args...)
 
+	ctx, cancel := context.WithTimeout(ctx, p.queryTimeout)
+	defer cancel()
+
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)
 	if ok {
 		return tx.Exec(ctx, q.QueryRaw, args...)
@@ -66,6 +72,9 @@ func (p *pg) ExecContext(ctx context.Context, q db.Query, args ...interface{}) (
 func (p *pg) QueryContext(ctx context.Context, q db.Query, args ...interface{}) (pgx.Rows, error) {
 	logQuery(ctx, q, args...)
 
+	ctx, cancel := context.WithTimeout(ctx, p.queryTimeout)
+	defer cancel()
+
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)
 	if ok {
 		return tx.Query(ctx, q.QueryRaw, args...)
@@ -76,6 +85,9 @@ func (p *pg) QueryContext(ctx context.Context, q db.Query, args ...interface{}) 
 
 func (p *pg) QueryRowContext(ctx context.Context, q db.Query, args ...interface{}) pgx.Row {
 	logQuery(ctx, q, args...)
+
+	ctx, cancel := context.WithTimeout(ctx, p.queryTimeout)
+	defer cancel()
 
 	tx, ok := ctx.Value(TxKey).(pgx.Tx)
 	if ok {
